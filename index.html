@@ -1,0 +1,1103 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="robots" content="noindex,nofollow" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="full-screen" content="yes" />
+    <meta name="browsermode" content="application" />
+    <meta name="x5-fullscreen" content="true" />
+    <meta name="x5-page-mode" content="app" />
+    <title> </title>
+    <style>
+      :root {
+        --bg-a: #6674e8;
+        --bg-b: #6a4ca8;
+        --ink: #222431;
+        --muted: #697083;
+        --line: #e3e5ec;
+        --primary: #6774f3;
+        --primary-dark: #5b48ad;
+        --success: #09813a;
+        --success-bg: #eaf8ef;
+        --warn: #e76318;
+        --warn-bg: #fff0d8;
+        --shell-viewport-height: 100vh;
+      }
+
+      @supports (height: 100dvh) {
+        :root {
+          --shell-viewport-height: 100dvh;
+        }
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+      }
+
+      body {
+        min-height: var(--shell-viewport-height);
+        color: var(--ink);
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+          "Microsoft YaHei", sans-serif;
+        background: linear-gradient(135deg, var(--bg-a), var(--bg-b));
+        overflow-x: hidden;
+      }
+
+      body.shell-chrome-hide {
+        min-height: calc(var(--shell-viewport-height) + 160px);
+        overflow-y: scroll;
+        overscroll-behavior: none;
+      }
+
+      body.shell-chrome-hide main {
+        min-height: calc(var(--shell-viewport-height) + 160px);
+      }
+
+      body.is-viewing {
+        background: #fff;
+      }
+
+      button {
+        font: inherit;
+      }
+
+      .screen {
+        min-height: var(--shell-viewport-height);
+        padding: 4vh 4vw;
+        display: grid;
+        place-items: center;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      .panel {
+        width: min(860px, 100%);
+        min-height: min(660px, 92vh);
+        padding: clamp(30px, 5vw, 58px);
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 24px 70px rgba(18, 20, 45, 0.22);
+      }
+
+      .check-panel {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .mark {
+        width: 132px;
+        height: 132px;
+        border: 9px solid #dfe4ff;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        margin-bottom: 22px;
+        background: linear-gradient(145deg, #6f76e3, #5a43a5);
+        position: relative;
+      }
+
+      .mark::before,
+      .mark::after {
+        content: "?";
+        width: 42px;
+        height: 42px;
+        display: grid;
+        place-items: center;
+        position: absolute;
+        top: 43px;
+        color: var(--primary);
+        font-size: 32px;
+        font-weight: 800;
+        background: #fff;
+        transform: rotate(45deg);
+      }
+
+      .mark::before {
+        left: 26px;
+      }
+
+      .mark::after {
+        right: 26px;
+      }
+
+      .mark span {
+        transform: rotate(-45deg);
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        font-size: clamp(28px, 4vw, 38px);
+        line-height: 1.15;
+      }
+
+      .check-text {
+        margin-top: 20px;
+        color: var(--primary);
+        font-size: clamp(20px, 3vw, 26px);
+      }
+
+      .check-action {
+        display: none;
+        min-height: 44px;
+        margin-top: 28px;
+        padding: 0 24px;
+        border: 0;
+        border-radius: 999px;
+        color: #fff;
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        box-shadow: 0 14px 28px rgba(91, 72, 173, 0.26);
+        font-size: 17px;
+        font-weight: 700;
+      }
+
+      #checking.needs-touch .check-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      #checking.is-blocked .check-text {
+        color: #c43d2f;
+      }
+
+      .steps {
+        width: min(560px, 100%);
+        margin-top: 48px;
+        display: grid;
+        gap: 19px;
+      }
+
+      .step {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        color: #c2c3ce;
+        font-size: clamp(17px, 2vw, 22px);
+      }
+
+      .step b {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        color: #fff;
+        background: #d9d7f4;
+      }
+
+      .step.active {
+        color: #343743;
+      }
+
+      .step.active b {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      }
+
+      .track {
+        width: min(560px, 100%);
+        height: 6px;
+        margin-top: auto;
+        overflow: hidden;
+        border-radius: 999px;
+        background: #e1e1e4;
+      }
+
+      .bar {
+        width: 8%;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+        transition: width 0.35s ease;
+      }
+
+      .selector {
+        position: relative;
+      }
+
+      .selector h2 {
+        text-align: center;
+        font-size: clamp(24px, 3vw, 32px);
+        line-height: 1.2;
+      }
+
+      .selector .hint {
+        max-width: 520px;
+        margin: 14px auto 0;
+        text-align: center;
+        color: #505766;
+        font-size: clamp(15px, 1.8vw, 19px);
+        line-height: 1.45;
+      }
+
+      .refresh {
+        position: absolute;
+        top: -112px;
+        right: 0;
+        width: 68px;
+        height: 52px;
+        border: 0;
+        border-radius: 999px;
+        color: #fff;
+        background: rgba(91, 72, 173, 0.34);
+        box-shadow: 0 16px 34px rgba(48, 38, 118, 0.2);
+        backdrop-filter: blur(8px);
+        cursor: pointer;
+      }
+
+      .refresh::before {
+        content: "↻ ↻";
+        font-size: 27px;
+        line-height: 1;
+      }
+
+      .section {
+        margin-top: 34px;
+      }
+
+      .section h3 {
+        color: #575d6c;
+        font-size: 19px;
+        line-height: 1.25;
+      }
+
+      .routes {
+        margin-top: 14px;
+        display: grid;
+        gap: 16px;
+      }
+
+      .route-config-error {
+        margin-top: 34px;
+        padding: 18px;
+        border: 1px solid #f2d7a7;
+        border-radius: 8px;
+        color: #975b00;
+        background: #fff8e8;
+        font-size: 16px;
+        line-height: 1.6;
+        text-align: center;
+      }
+
+      .route {
+        min-height: 72px;
+        padding: 0 24px;
+        border: 2px solid var(--line);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        color: var(--ink);
+        background: #fff;
+        cursor: pointer;
+      }
+
+      .route.fastest {
+        border-color: var(--primary);
+        background: #f8f8ff;
+      }
+
+      .name {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        min-width: 0;
+        font-size: clamp(19px, 2.5vw, 24px);
+        font-weight: 800;
+      }
+
+      .badge {
+        flex: 0 0 auto;
+        padding: 5px 11px;
+        border-radius: 999px;
+        color: #fff;
+        background: #2694e8;
+        font-size: 14px;
+        font-style: normal;
+      }
+
+      .latency {
+        flex: 0 0 auto;
+        min-width: 92px;
+        padding: 8px 15px;
+        border-radius: 999px;
+        color: var(--success);
+        background: var(--success-bg);
+        text-align: center;
+        font-size: clamp(15px, 1.8vw, 19px);
+        font-weight: 800;
+      }
+
+      .latency.slow,
+      .latency.error {
+        color: var(--warn);
+        background: var(--warn-bg);
+      }
+
+      .viewer {
+        width: 100%;
+        height: var(--shell-viewport-height);
+        max-height: var(--shell-viewport-height);
+        position: relative;
+        background: #fff;
+        overflow: hidden;
+      }
+
+      body.is-viewing .viewer {
+        position: fixed;
+        inset: 0;
+      }
+
+      iframe {
+        display: block;
+        width: 100%;
+        height: 100%;
+        border: 0;
+      }
+
+      .route-float {
+        position: fixed;
+        z-index: 6;
+        top: calc(env(safe-area-inset-top, 0px) + 16px);
+        right: calc(env(safe-area-inset-right, 0px) + 16px);
+        width: 52px;
+        height: 52px;
+        touch-action: none;
+        user-select: none;
+      }
+
+      .float-trigger {
+        width: 52px;
+        height: 52px;
+        border: 0;
+        border-radius: 50%;
+        color: #fff;
+        background: rgba(36, 39, 54, 0.78);
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(8px);
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+        font-size: 17px;
+        font-weight: 800;
+      }
+
+      .route-float.dragging .float-trigger {
+        cursor: grabbing;
+        transform: scale(0.96);
+      }
+
+      .float-panel {
+        position: absolute;
+        top: 0;
+        right: 60px;
+        min-width: 140px;
+        padding: 7px;
+        border-radius: 8px;
+        background: rgba(36, 39, 54, 0.86);
+        box-shadow: 0 16px 38px rgba(0, 0, 0, 0.22);
+        backdrop-filter: blur(10px);
+        opacity: 0;
+        pointer-events: none;
+        transform: translateX(8px) scale(0.96);
+        transition: opacity 0.18s ease, transform 0.18s ease;
+      }
+
+      .route-float.align-left .float-panel {
+        right: auto;
+        left: 60px;
+        transform: translateX(-8px) scale(0.96);
+      }
+
+      .route-float.align-bottom .float-panel {
+        top: auto;
+        bottom: 0;
+      }
+
+      .route-float.open .float-panel {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateX(0) scale(1);
+      }
+
+      .float-action {
+        width: 100%;
+        min-height: 40px;
+        padding: 0 13px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 8px;
+        color: #fff;
+        background: rgba(255, 255, 255, 0.08);
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .float-action:active {
+        transform: translateY(1px);
+      }
+
+      .loading {
+        position: fixed;
+        z-index: 4;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        gap: 16px;
+        align-content: center;
+        color: #fff;
+        background: linear-gradient(135deg, var(--bg-a), var(--bg-b));
+      }
+
+      .spinner {
+        width: 46px;
+        height: 46px;
+        border: 5px solid rgba(255, 255, 255, 0.35);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @media (max-width: 640px) {
+        .screen {
+          padding: 18px;
+        }
+
+        .panel {
+          min-height: auto;
+          padding: 30px 22px 38px;
+          border-radius: 18px;
+        }
+
+        #checking .panel {
+          min-height: calc(var(--shell-viewport-height) - 36px);
+        }
+
+        #selecting {
+          align-items: start;
+          padding: clamp(138px, 22svh, 210px) 20px 80px;
+        }
+
+        #selecting .selector {
+          width: min(100%, 360px);
+        }
+
+        .selector h2 {
+          font-size: 25px;
+        }
+
+        .selector .hint {
+          max-width: 305px;
+          margin-top: 12px;
+          font-size: 16px;
+        }
+
+        .refresh {
+          top: -116px;
+          right: -6px;
+          width: 66px;
+          height: 50px;
+        }
+
+        .section {
+          margin-top: 28px;
+        }
+
+        .section h3 {
+          font-size: 17px;
+        }
+
+        .route {
+          min-height: 58px;
+          padding: 0 18px;
+          border-radius: 10px;
+        }
+
+        .name {
+          flex-wrap: wrap;
+          gap: 8px;
+          font-size: 18px;
+        }
+
+        .badge {
+          padding: 4px 9px;
+          font-size: 12px;
+        }
+
+        .latency {
+          min-width: 78px;
+          padding: 6px 12px;
+          font-size: 16px;
+        }
+
+        .route-float {
+          top: calc(env(safe-area-inset-top, 0px) + 12px);
+          right: calc(env(safe-area-inset-right, 0px) + 12px);
+        }
+      }
+    </style>
+  </head>
+  <body class="shell-chrome-hide">
+    <main>
+      <section class="screen" id="checking">
+        <div class="panel check-panel">
+          <div class="mark" aria-hidden="true"><span></span></div>
+          <h1>安全检测中</h1>
+          <p class="check-text" id="checkText">检测浏览器环境...</p>
+          <div class="steps" id="steps"></div>
+          <button class="check-action" id="checkAction" type="button">轻触继续</button>
+          <div class="track" aria-hidden="true"><div class="bar" id="bar"></div></div>
+        </div>
+      </section>
+
+      <section class="screen hidden" id="selecting">
+        <div class="panel selector">
+          <button class="refresh" id="refresh" aria-label="重新检测"></button>
+          <h2>请选择访问线路</h2>
+          <p class="hint">如遇打不开，请尝试其他线路。</p>
+          <div id="routeSections"></div>
+        </div>
+      </section>
+
+      <section class="viewer hidden" id="viewer">
+        <div class="route-float" id="routeFloat">
+          <button class="float-trigger" id="routeFloatTrigger" type="button" aria-label="线路菜单" aria-expanded="false">线</button>
+          <div class="float-panel" id="routeFloatPanel">
+            <button class="float-action" id="switch" type="button">重选线路</button>
+          </div>
+        </div>
+        <div class="loading hidden" id="loading">
+          <div class="spinner"></div>
+          <p>加载中...如打不开请重选线路</p>
+        </div>
+        <iframe
+          id="frame"
+          title="线路内容"
+          allow="clipboard-write; fullscreen; autoplay; encrypted-media"
+          sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation allow-modals"
+          referrerpolicy="no-referrer-when-downgrade"
+        ></iframe>
+      </section>
+    </main>
+
+    <script src="/embed-shell.js?v=207"></script>
+    <script>
+      const STORAGE_KEY = "selected-route-id";
+      const FLOAT_POSITION_KEY = "route-float-position";
+      const CHECK_STEPS = ["检测浏览器环境", "验证安全连接", "检查访问权限", "完成安全验证"];
+      // 线路只从站点根目录的 lines.json 读取，页面源码不保存业务域名。
+      const DEFAULT_ROUTES = [];
+
+      let routes = DEFAULT_ROUTES;
+      let results = {};
+      let lastRouteId = localStorage.getItem(STORAGE_KEY);
+      let hasHumanSignal = false;
+      let safetyReady = false;
+      let isAdvancingToRoutes = false;
+      let accessBlocked = false;
+      let browserChromeHideQueued = false;
+
+      const checking = document.getElementById("checking");
+      const selecting = document.getElementById("selecting");
+      const viewer = document.getElementById("viewer");
+      const loading = document.getElementById("loading");
+      const frame = document.getElementById("frame");
+      const routeFloat = document.getElementById("routeFloat");
+      const routeFloatTrigger = document.getElementById("routeFloatTrigger");
+      const checkText = document.getElementById("checkText");
+      const checkAction = document.getElementById("checkAction");
+      const steps = document.getElementById("steps");
+      const bar = document.getElementById("bar");
+      const routeSections = document.getElementById("routeSections");
+      let floatDrag = null;
+      const loginBridge = createAomen28ShellBridge(frame);
+
+      function requestWechatFullscreen() {
+        try {
+          if (typeof WeixinJSBridge !== "undefined" && WeixinJSBridge.call) {
+            WeixinJSBridge.call("hideToolbar");
+          }
+        } catch {
+        }
+      }
+
+      document.addEventListener("WeixinJSBridgeReady", requestWechatFullscreen);
+      requestWechatFullscreen();
+
+      [120, 420, 900, 1600, 2600].forEach((delay) => {
+        setTimeout(requestWechatFullscreen, delay);
+      });
+
+      function viewportSize() {
+        const visualViewport = window.visualViewport;
+        return {
+          width: Math.round(visualViewport?.width || window.innerWidth || document.documentElement.clientWidth),
+          height: Math.round(visualViewport?.height || window.innerHeight || document.documentElement.clientHeight)
+        };
+      }
+
+      function updateShellViewportHeight() {
+        const { height } = viewportSize();
+        if (height > 0) {
+          document.documentElement.style.setProperty("--shell-viewport-height", `${height}px`);
+        }
+      }
+
+      function requestBrowserChromeHide() {
+        if (browserChromeHideQueued) return;
+        browserChromeHideQueued = true;
+
+        const nudge = () => {
+          requestWechatFullscreen();
+          updateShellViewportHeight();
+          try {
+            window.scrollTo(0, 1);
+          } catch {
+          }
+        };
+
+        nudge();
+        [80, 220, 520, 980, 1600].forEach((delay) => setTimeout(nudge, delay));
+        setTimeout(() => {
+          browserChromeHideQueued = false;
+        }, 1750);
+      }
+
+      function show(name) {
+        updateShellViewportHeight();
+        document.body.classList.add("shell-chrome-hide");
+        document.body.classList.toggle("is-viewing", name === "viewing");
+        checking.classList.toggle("hidden", name !== "checking");
+        selecting.classList.toggle("hidden", name !== "selecting");
+        viewer.classList.toggle("hidden", name !== "viewing");
+        requestBrowserChromeHide();
+      }
+
+      function isInAppBrowser() {
+        const ua = (navigator.userAgent || "").toLowerCase();
+        return (
+          /\bwv\b/.test(ua) &&
+          (ua.includes(" wv)") || ua.includes("; wv)"))
+        ) || ua.includes("webview") || ua.includes("wkwebview") || ua.includes("x5webview");
+      }
+
+      function shouldDirectOpen() {
+        const requestedMode = new URLSearchParams(window.location.search).get("open");
+        if (requestedMode === "direct") return true;
+        if (requestedMode === "frame") return false;
+        return false; // Stay in the Azure shell unless explicitly opened with ?open=direct.
+      }
+
+      function isObviousAutomation() {
+        return !isInAppBrowser() && navigator.webdriver === true;
+      }
+
+      function markHumanSignal(event) {
+        if (accessBlocked || hasHumanSignal) return;
+        if (event && "isTrusted" in event && event.isTrusted === false) return;
+
+        hasHumanSignal = true;
+        checking.classList.remove("needs-touch");
+        continueAfterSafety();
+      }
+
+      function setupHumanSignalListeners() {
+        ["pointerdown", "touchstart", "keydown", "wheel"].forEach((eventName) => {
+          window.addEventListener(eventName, markHumanSignal, { capture: true, passive: true });
+        });
+      }
+
+      function blockAutomatedAccess() {
+        accessBlocked = true;
+        checking.classList.add("is-blocked");
+        checking.classList.remove("needs-touch");
+        checkText.textContent = "请使用正常浏览器手动访问";
+        bar.style.width = "34%";
+      }
+
+      async function continueAfterSafety() {
+        if (accessBlocked || isAdvancingToRoutes || !safetyReady || !hasHumanSignal) return;
+
+        isAdvancingToRoutes = true;
+        checking.classList.remove("needs-touch");
+        checkText.textContent = "验证通过，正在选择可用线路...";
+        await runRouteTests();
+        bar.style.width = "100%";
+        setTimeout(() => show("selecting"), 240);
+      }
+
+      function normalizeRoutes(value) {
+        const list = Array.isArray(value) ? value : Array.isArray(value?.routes) ? value.routes : [];
+        return list.filter((route) => route && route.id && route.name && aomen28HttpsOrigin(route.url) && aomen28HttpsOrigin(route.url) !== window.location.origin);
+      }
+
+      async function loadRoutes() {
+        try {
+          const response = await fetch(`/lines.json?_=${Date.now()}`, { cache: "no-store" });
+          if (!response.ok) return DEFAULT_ROUTES;
+          const loaded = normalizeRoutes(await response.json());
+          return loaded.length ? loaded : DEFAULT_ROUTES;
+        } catch {
+          return DEFAULT_ROUTES;
+        }
+      }
+
+      function createEmptyResults() {
+        results = Object.fromEntries(
+          routes.map((route) => [route.id, { latency: null, status: "testing" }])
+        );
+      }
+
+      async function testRoute(route) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 3800);
+        const started = performance.now();
+
+        try {
+          const target = route.healthUrl || route.url;
+          const separator = target.includes("?") ? "&" : "?";
+          await fetch(`${target}${separator}_=${Date.now()}`, {
+            cache: "no-store",
+            mode: "no-cors",
+            signal: controller.signal
+          });
+          const latency = Math.max(1, Math.round(performance.now() - started));
+          return { latency, status: latency > 900 ? "slow" : "online" };
+        } catch {
+          return { latency: null, status: "error" };
+        } finally {
+          clearTimeout(timer);
+        }
+      }
+
+      async function runRouteTests() {
+        createEmptyResults();
+        renderRoutes();
+        const entries = await Promise.all(routes.map(async (route) => [route.id, await testRoute(route)]));
+        results = Object.fromEntries(entries);
+        renderRoutes();
+      }
+
+      function fastestRouteId() {
+        return routes
+          .filter((route) => results[route.id]?.latency !== null)
+          .sort((a, b) => (results[a.id]?.latency || Infinity) - (results[b.id]?.latency || Infinity))[0]?.id;
+      }
+
+      function buildFrameUrl(routeUrl) {
+        const shellUrl = new URL(window.location.href);
+        const carryPath = shellUrl.pathname !== "/" && shellUrl.pathname !== "/index.html";
+        try {
+          const targetUrl = new URL(routeUrl, window.location.origin);
+          if (carryPath) {
+            const basePath = targetUrl.pathname.replace(/\/+$/, "");
+            const shellPath = shellUrl.pathname.startsWith("/") ? shellUrl.pathname : `/${shellUrl.pathname}`;
+            targetUrl.pathname = `${basePath}${shellPath}`.replace(/\/{2,}/g, "/");
+          }
+          if (!carryPath && targetUrl.pathname === "/") targetUrl.pathname = "/frontend-web/index.html";
+          const carriedKeys = new Set([...shellUrl.searchParams.keys()].filter(key => key !== "open"));
+          carriedKeys.forEach(key => targetUrl.searchParams.delete(key));
+          shellUrl.searchParams.forEach((value, key) => {
+            if (key !== "open") targetUrl.searchParams.append(key, value);
+          });
+          if (shellUrl.hash && !targetUrl.hash) targetUrl.hash = shellUrl.hash;
+          return targetUrl.toString();
+        } catch {
+          if (!shellUrl.search) return routeUrl;
+          return `${routeUrl}${routeUrl.includes("?") ? "&" : "?"}${shellUrl.search.slice(1)}`;
+        }
+      }
+
+      function clampFloatPosition(left, top) {
+        const rect = routeFloat.getBoundingClientRect();
+        const viewport = viewportSize();
+        const margin = 8;
+        const maxLeft = Math.max(margin, viewport.width - rect.width - margin);
+        const maxTop = Math.max(margin, viewport.height - rect.height - margin);
+
+        return {
+          left: Math.min(Math.max(margin, left), maxLeft),
+          top: Math.min(Math.max(margin, top), maxTop)
+        };
+      }
+
+      function updateFloatDirection(left, top) {
+        const viewport = viewportSize();
+        routeFloat.classList.toggle("align-left", left < viewport.width / 2);
+        routeFloat.classList.toggle("align-bottom", top > viewport.height / 2);
+      }
+
+      function placeFloat(left, top) {
+        const next = clampFloatPosition(left, top);
+        routeFloat.style.left = `${next.left}px`;
+        routeFloat.style.top = `${next.top}px`;
+        routeFloat.style.right = "auto";
+        updateFloatDirection(next.left, next.top);
+      }
+
+      function saveFloatPosition() {
+        try {
+          const rect = routeFloat.getBoundingClientRect();
+          localStorage.setItem(FLOAT_POSITION_KEY, JSON.stringify({ left: rect.left, top: rect.top }));
+        } catch {
+        }
+      }
+
+      function restoreFloatPosition() {
+        try {
+          const raw = localStorage.getItem(FLOAT_POSITION_KEY);
+          if (!raw) return;
+          const position = JSON.parse(raw);
+          if (Number.isFinite(position?.left) && Number.isFinite(position?.top)) {
+            requestAnimationFrame(() => placeFloat(position.left, position.top));
+          }
+        } catch {
+        }
+      }
+
+      function setFloatOpen(isOpen) {
+        routeFloat.classList.toggle("open", isOpen);
+        routeFloatTrigger.setAttribute("aria-expanded", String(isOpen));
+      }
+
+      function toggleFloatMenu() {
+        setFloatOpen(!routeFloat.classList.contains("open"));
+      }
+
+      function startFloatDrag(event) {
+        if (event.pointerType === "mouse" && event.button !== 0) return;
+        const rect = routeFloat.getBoundingClientRect();
+        floatDrag = {
+          pointerId: event.pointerId,
+          startX: event.clientX,
+          startY: event.clientY,
+          startLeft: rect.left,
+          startTop: rect.top,
+          moved: false
+        };
+        routeFloatTrigger.setPointerCapture?.(event.pointerId);
+      }
+
+      function moveFloatDrag(event) {
+        if (!floatDrag || event.pointerId !== floatDrag.pointerId) return;
+        const dx = event.clientX - floatDrag.startX;
+        const dy = event.clientY - floatDrag.startY;
+
+        if (!floatDrag.moved && Math.hypot(dx, dy) > 5) {
+          floatDrag.moved = true;
+          routeFloat.classList.add("dragging");
+          setFloatOpen(false);
+        }
+
+        if (floatDrag.moved) {
+          event.preventDefault();
+          placeFloat(floatDrag.startLeft + dx, floatDrag.startTop + dy);
+        }
+      }
+
+      function endFloatDrag(event) {
+        if (!floatDrag || event.pointerId !== floatDrag.pointerId) return;
+        const wasMoved = floatDrag.moved;
+        floatDrag = null;
+        routeFloat.classList.remove("dragging");
+        routeFloatTrigger.releasePointerCapture?.(event.pointerId);
+
+        if (wasMoved) {
+          saveFloatPosition();
+          return;
+        }
+
+        toggleFloatMenu();
+      }
+
+      function loadFrameWithReplace(targetUrl) {
+        try {
+          frame.contentWindow.location.replace(targetUrl);
+        } catch {
+          frame.setAttribute("src", targetUrl);
+        }
+      }
+
+      function chooseRoute(route) {
+        localStorage.setItem(STORAGE_KEY, route.id);
+        lastRouteId = route.id;
+        loading.classList.remove("hidden");
+        show("viewing");
+        restoreFloatPosition();
+        const targetUrl = buildFrameUrl(route.url);
+        loginBridge.select(targetUrl);
+        if (shouldDirectOpen()) {
+          window.location.replace(targetUrl);
+          return;
+        }
+        requestAnimationFrame(() => loadFrameWithReplace(targetUrl));
+      }
+
+      function routeButton(route, bestId) {
+        const result = results[route.id] || { latency: null, status: "testing" };
+        const isFastest = route.id === bestId;
+        const button = document.createElement("button");
+        button.className = `route ${isFastest ? "fastest" : ""}`;
+        button.type = "button";
+        button.innerHTML = `
+          <span class="name">
+            ${route.name}
+            ${isFastest ? '<em class="badge">最快</em>' : route.badge ? `<em class="badge">${route.badge}</em>` : ""}
+          </span>
+          <span class="latency ${result.status}">
+            ${result.status === "testing" ? "检测中" : result.latency === null ? "不可用" : `${result.latency}ms`}
+          </span>
+        `;
+        button.addEventListener("click", () => chooseRoute(route));
+        return button;
+      }
+
+      function section(title, sectionRoutes, bestId) {
+        if (!sectionRoutes.length) return null;
+        const wrap = document.createElement("section");
+        wrap.className = "section";
+        const h3 = document.createElement("h3");
+        h3.textContent = title;
+        const list = document.createElement("div");
+        list.className = "routes";
+        sectionRoutes.forEach((route) => list.appendChild(routeButton(route, bestId)));
+        wrap.append(h3, list);
+        return wrap;
+      }
+
+      function appendSection(title, sectionRoutes, bestId) {
+        const block = section(title, sectionRoutes, bestId);
+        if (block) routeSections.appendChild(block);
+      }
+
+      function renderRoutes() {
+        routeSections.innerHTML = "";
+        if (!routes.length) {
+          const message = document.createElement("p");
+          message.className = "route-config-error";
+          message.textContent = "访问线路尚未配置，请联系管理员。";
+          routeSections.appendChild(message);
+          return;
+        }
+        const bestId = fastestRouteId();
+        const lastRoute = routes.find((route) => route.id === lastRouteId);
+        if (lastRoute) appendSection("上次选择的线路", [lastRoute], bestId);
+        const others = lastRoute ? routes.filter((route) => route.id !== lastRouteId) : routes;
+        appendSection(lastRoute ? "其他线路" : "可用线路", others, bestId);
+      }
+
+      function renderSteps(activeIndex) {
+        steps.innerHTML = "";
+        CHECK_STEPS.slice(0, 3).forEach((step, index) => {
+          const item = document.createElement("div");
+          item.className = `step ${index <= activeIndex ? "active" : ""}`;
+          item.innerHTML = `<b>${index + 1}</b><span>${step}</span>`;
+          steps.appendChild(item);
+        });
+      }
+
+      async function boot() {
+        setupHumanSignalListeners();
+
+        if (isObviousAutomation()) {
+          blockAutomatedAccess();
+          renderSteps(0);
+          return;
+        }
+
+        renderSteps(0);
+        CHECK_STEPS.forEach((step, index) => {
+          setTimeout(() => {
+            checkText.textContent = `${step}...`;
+            renderSteps(index);
+            bar.style.width = `${Math.min(98, 14 + index * 26)}%`;
+          }, 480 + index * 580);
+        });
+
+        routes = await loadRoutes();
+        loginBridge.configure(routes);
+        createEmptyResults();
+        setTimeout(() => {
+          safetyReady = true;
+          if (!hasHumanSignal) {
+            checking.classList.add("needs-touch");
+            checkText.textContent = "请轻触屏幕继续...";
+            bar.style.width = "96%";
+          }
+          continueAfterSafety();
+        }, 3000);
+      }
+
+      checkAction.addEventListener("click", markHumanSignal);
+      document.getElementById("refresh").addEventListener("click", runRouteTests);
+      document.getElementById("switch").addEventListener("click", () => {
+        setFloatOpen(false);
+        show("selecting");
+      });
+      routeFloatTrigger.addEventListener("pointerdown", startFloatDrag);
+      routeFloatTrigger.addEventListener("pointermove", moveFloatDrag);
+      routeFloatTrigger.addEventListener("pointerup", endFloatDrag);
+      routeFloatTrigger.addEventListener("pointercancel", endFloatDrag);
+      routeFloatTrigger.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          toggleFloatMenu();
+        }
+      });
+      document.addEventListener("click", (event) => {
+        if (!routeFloat.contains(event.target)) {
+          setFloatOpen(false);
+        }
+      });
+
+      function refreshViewportLayout() {
+        updateShellViewportHeight();
+        if (viewer.classList.contains("hidden")) return;
+        const rect = routeFloat.getBoundingClientRect();
+        placeFloat(rect.left, rect.top);
+        saveFloatPosition();
+        requestBrowserChromeHide();
+      }
+
+      window.addEventListener("resize", refreshViewportLayout);
+      window.addEventListener("orientationchange", () => setTimeout(refreshViewportLayout, 260));
+      window.visualViewport?.addEventListener("resize", refreshViewportLayout);
+      window.visualViewport?.addEventListener("scroll", refreshViewportLayout);
+      window.addEventListener("touchstart", requestBrowserChromeHide, { passive: true });
+      window.addEventListener("pointerdown", requestBrowserChromeHide, { passive: true });
+      frame.addEventListener("load", () => {
+        loading.classList.add("hidden");
+        setTimeout(refreshViewportLayout, 50);
+        requestBrowserChromeHide();
+      });
+      updateShellViewportHeight();
+      boot();
+    </script>
+  </body>
+</html>
