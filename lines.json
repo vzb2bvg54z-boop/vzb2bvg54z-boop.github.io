@@ -1,0 +1,11 @@
+{
+  "routes": [
+    {
+      "id": "route-1",
+      "name": "线路一",
+      "badge": "主入口",
+      "url": "https://mgm.pc368.top/",
+      "healthUrl": "https://mgm.pc368.top/"
+    }
+  ]
+}
